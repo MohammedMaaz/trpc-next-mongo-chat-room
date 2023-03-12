@@ -1,11 +1,11 @@
 /**
  * This is a Next.js page.
  */
-import { trpc } from '../utils/trpc';
+import { trpc } from "../utils/trpc";
 
 export default function IndexPage() {
   // 💡 Tip: CMD+Click (or CTRL+Click) on `greeting` to go to the server definition
-  const result = trpc.greeting.useQuery({ name: 'client' });
+  const result = trpc.greeting.useQuery({ name: "client" });
 
   if (!result.data) {
     return (
@@ -28,9 +28,9 @@ export default function IndexPage() {
 }
 
 const styles = {
-  width: '100vw',
-  height: '100vh',
-  display: 'flex',
-  justifyContent: 'center',
-  alignItems: 'center',
+  width: "100vw",
+  height: "100vh",
+  display: "flex",
+  justifyContent: "center",
+  alignItems: "center",
 };
