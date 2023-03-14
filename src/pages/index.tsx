@@ -9,15 +9,9 @@ import MsgList from "~/components/pages/home/msgList";
 
 const useStyles = createStyles((theme) => ({
   root: {
-    width: "100vw",
     height: "100vh",
     display: "flex",
     flexDirection: "column",
-  },
-  listContainer: {
-    flex: 1,
-    height: "max-content",
-    border: "1px solid",
   },
 }));
 
@@ -64,9 +58,7 @@ export default function IndexPage() {
 
   return (
     <Box className={classes.root}>
-      <Box className={classes.listContainer}>
-        <MsgList list={list || []} loading={isLoading} />
-      </Box>
+      <MsgList list={list || []} loading={isLoading} />
       <MsgForm
         onSubmit={handleSubmit}
         loading={addMutation.isLoading || uploadMutation.isLoading}
