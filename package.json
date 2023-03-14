@@ -6,7 +6,8 @@
     "dev": "next dev",
     "build": "next build",
     "lint": "eslint --ext \".js,.ts,.tsx\" --report-unused-disable-directives src",
-    "start": "next start"
+    "start": "next start",
+    "postinstall": "cd node_modules/ts-mongo && pnpm install && pnpm run build"
   },
   "dependencies": {
     "@aws-sdk/client-s3": "^3.289.0",

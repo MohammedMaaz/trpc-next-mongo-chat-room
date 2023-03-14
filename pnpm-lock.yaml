@@ -66,7 +66,7 @@ dependencies:
   next: 13.2.4_biqbaboplfbrettd7655fr4n2y
   react: 18.2.0
   react-dom: 18.2.0_react@18.2.0
-  ts-mongo: github.com/MohammedMaaz/ts-mongo/bd88f6785b319d272e9b9f470823e0f1dc8d92d6
+  ts-mongo: github.com/MohammedMaaz/ts-mongo/cbaa17e5a83318afa377cca095b127705aef6280
   zod: 3.21.4
 
 devDependencies:
@@ -6580,8 +6580,8 @@ packages:
     resolution: {integrity: sha512-m46AKbrzKVzOzs/DZgVnG5H55N1sv1M8qZU3A8RIKbs3mrACDNeIOeilDymVb2HdmP8uwshOCF4uJ8uM9rCqJw==}
     dev: false
 
-  github.com/MohammedMaaz/ts-mongo/bd88f6785b319d272e9b9f470823e0f1dc8d92d6:
-    resolution: {tarball: https://codeload.github.com/MohammedMaaz/ts-mongo/tar.gz/bd88f6785b319d272e9b9f470823e0f1dc8d92d6}
+  github.com/MohammedMaaz/ts-mongo/cbaa17e5a83318afa377cca095b127705aef6280:
+    resolution: {tarball: https://codeload.github.com/MohammedMaaz/ts-mongo/tar.gz/cbaa17e5a83318afa377cca095b127705aef6280}
     name: ts-mongo
     version: 1.0.0
     dev: false
