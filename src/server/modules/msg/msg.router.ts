@@ -1,20 +1,20 @@
-import { publicProcedure, router } from "~/server/trpc";
-import { Msg, msgCollection, msgSchema } from "./msg.model";
-import * as z from "zod";
-import { deleteImg, getImgUrl, getPreSignedUrl } from "~/server/s3";
 import { ObjectId } from "mongodb";
+import * as z from "zod";
+import { publicProcedure, router } from "~/server/trpc";
+import { deleteImg, getImgUrl, getPreSignedUrl } from "~/server/s3";
+import { Msg, msgCollection, msgSchema } from "./msg.model";
 
 export const msgRouter = router({
   list: publicProcedure
     .input(
       z.object({
         limit: z.number().int().min(1).optional(),
-        page: z.number().int().min(1).positive().optional(),
+        cursor: z.number().int().min(1).optional(),
       })
     )
     .query(async ({ input, ctx: { db } }) => {
       const limit = input?.limit ?? 10;
-      const page = input?.page ?? 1;
+      const page = input?.cursor ?? 1;
       const skipCount = (page - 1) * limit;
 
       const collection = msgCollection(db);
@@ -25,17 +25,20 @@ export const msgRouter = router({
         .limit(limit)
         .toArray();
 
-      return msgs.map((msg) => ({
-        ...msg,
-        imgUrl: msg.hasImage ? getImgUrl(msg._id.toString()) : null,
-      }));
+      return {
+        list: msgs.map((msg) => ({
+          ...msg,
+          imgUrl: msg.hasImage ? getImgUrl(msg._id.toString()) : null,
+        })),
+        nextCursor: msgs.length === limit ? page + 1 : undefined,
+      };
     }),
 
   add: publicProcedure
     .input(
       z.object({
         ...msgSchema.shape,
-        createdAt: z.NEVER,
+        createdAt: z.undefined(),
       })
     )
     .mutation(async ({ input, ctx: { db } }) => {
@@ -61,7 +64,9 @@ export const msgRouter = router({
       });
 
       if (value?.hasImage) {
-        await deleteImg(value._id.toString());
+        await deleteImg(value._id.toString()).catch((err) => {
+          console.error("Error deleting image: ", err);
+        });
       }
     }),
 });

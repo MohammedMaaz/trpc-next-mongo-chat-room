@@ -1,36 +1,76 @@
-/**
- * This is a Next.js page.
- */
+import { useCallback } from "react";
+import { FormValues } from "~/components/pages/home/msgForm.helpers";
+import { useMutation } from "@tanstack/react-query";
 import { trpc } from "../utils/trpc";
+import { uploadFileToUrl } from "~/utils/file";
+import { Box, createStyles } from "@mantine/core";
+import MsgForm from "~/components/pages/home/msgForm";
+import MsgList from "~/components/pages/home/msgList";
+
+const useStyles = createStyles((theme) => ({
+  root: {
+    width: "100vw",
+    height: "100vh",
+    display: "flex",
+    flexDirection: "column",
+  },
+  listContainer: {
+    flex: 1,
+    height: "max-content",
+    border: "1px solid",
+  },
+}));
 
 export default function IndexPage() {
-  // 💡 Tip: CMD+Click (or CTRL+Click) on `greeting` to go to the server definition
-  const result = trpc.greeting.useQuery({ name: "client" });
+  const { classes } = useStyles();
+  const ctx = trpc.useContext();
 
-  if (!result.data) {
-    return (
-      <div style={styles}>
-        <h1>Loading...</h1>
-      </div>
+  const {
+    data,
+    fetchNextPage,
+    hasNextPage,
+    isFetching,
+    isFetchingNextPage,
+    isLoading,
+  } = trpc.msg.list.useInfiniteQuery(
+    { limit: 10 },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor }
+  );
+  const uploadMutation = useMutation({
+    mutationFn: uploadFileToUrl,
+    onSuccess: () => {
+      ctx.msg.list.invalidate();
+    },
+  });
+  const addMutation = trpc.msg.add.useMutation({
+    onSuccess: (url) => {
+      if (!url) ctx.msg.list.invalidate();
+    },
+  });
+
+  const handleSubmit = useCallback((values: FormValues) => {
+    addMutation.mutate(
+      { text: values.text, hasImage: !!values.image },
+      {
+        onSuccess: (url) => {
+          if (url && values.image)
+            uploadMutation.mutate({ file: values.image, url });
+        },
+      }
     );
-  }
+  }, []);
+
+  const list = data?.pages.map((item) => item.list).flat();
+
   return (
-    <div style={styles}>
-      {/**
-       * The type is defined and can be autocompleted
-       * 💡 Tip: Hover over `data` to see the result type
-       * 💡 Tip: CMD+Click (or CTRL+Click) on `text` to go to the server definition
-       * 💡 Tip: Secondary click on `text` and "Rename Symbol" to rename it both on the client & server
-       */}
-      <h1>{result.data.text}</h1>
-    </div>
+    <Box className={classes.root}>
+      <Box className={classes.listContainer}>
+        <MsgList list={list || []} loading={isLoading} />
+      </Box>
+      <MsgForm
+        onSubmit={handleSubmit}
+        loading={addMutation.isLoading || uploadMutation.isLoading}
+      />
+    </Box>
   );
 }
-
-const styles = {
-  width: "100vw",
-  height: "100vh",
-  display: "flex",
-  justifyContent: "center",
-  alignItems: "center",
-};
