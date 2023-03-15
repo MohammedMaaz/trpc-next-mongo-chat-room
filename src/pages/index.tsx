@@ -1,13 +1,12 @@
 import { useCallback } from "react";
-import { FormValues } from "~/components/pages/home/msgForm.helpers";
-import { useMutation } from "@tanstack/react-query";
-import { trpc } from "../utils/trpc";
-import { uploadFileToUrl } from "~/utils/file";
 import { Box, createStyles } from "@mantine/core";
-import MsgForm from "~/components/pages/home/msgForm";
-import MsgList from "~/components/pages/home/msgList";
+import MsgForm from "~/components/msg/msgForm";
+import MsgList from "~/components/msg/msgList";
+import { useOnScrollEndReached } from "../../hooks/common/useOnScrollEndReached";
+import { useInfiniteMessagesList } from "../../hooks/msg/useInfiniteMessagesList";
+import { useHandleMessageSend } from "../../hooks/msg/useHandleMessageSend";
 
-const useStyles = createStyles((theme) => ({
+const useStyles = createStyles(() => ({
   root: {
     height: "100vh",
     display: "flex",
@@ -17,52 +16,28 @@ const useStyles = createStyles((theme) => ({
 
 export default function IndexPage() {
   const { classes } = useStyles();
-  const ctx = trpc.useContext();
 
-  const {
-    data,
-    fetchNextPage,
-    hasNextPage,
-    isFetching,
-    isFetchingNextPage,
-    isLoading,
-  } = trpc.msg.list.useInfiniteQuery(
-    { limit: 10 },
-    { getNextPageParam: (lastPage) => lastPage.nextCursor }
-  );
-  const uploadMutation = useMutation({
-    mutationFn: uploadFileToUrl,
-    onSuccess: () => {
-      ctx.msg.list.invalidate();
-    },
-  });
-  const addMutation = trpc.msg.add.useMutation({
-    onSuccess: (url) => {
-      if (!url) ctx.msg.list.invalidate();
-    },
-  });
+  const { list, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
+    useInfiniteMessagesList();
 
-  const handleSubmit = useCallback((values: FormValues) => {
-    addMutation.mutate(
-      { text: values.text, hasImage: !!values.image },
-      {
-        onSuccess: (url) => {
-          if (url && values.image)
-            uploadMutation.mutate({ file: values.image, url });
-        },
-      }
-    );
-  }, []);
+  const { handler, isLoading: isSentLoading } = useHandleMessageSend();
 
-  const list = data?.pages.map((item) => item.list).flat();
+  // Infinite scroll handling
+  const onEndReached = useCallback(() => {
+    if (hasNextPage && !isFetchingNextPage) fetchNextPage();
+  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+
+  const { ref } = useOnScrollEndReached(onEndReached, { direction: "up" });
 
   return (
     <Box className={classes.root}>
-      <MsgList list={list || []} loading={isLoading} />
-      <MsgForm
-        onSubmit={handleSubmit}
-        loading={addMutation.isLoading || uploadMutation.isLoading}
+      <MsgList
+        containerRef={ref as React.RefObject<HTMLDivElement>}
+        list={list || []}
+        loading={isLoading}
+        loadingMore={isFetchingNextPage}
       />
+      <MsgForm onSubmit={handler} loading={isSentLoading} />
     </Box>
   );
 }

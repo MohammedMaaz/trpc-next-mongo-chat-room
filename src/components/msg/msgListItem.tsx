@@ -1,4 +1,4 @@
-import React, { useCallback, useState } from "react";
+import React, { useCallback } from "react";
 import {
   ActionIcon,
   Box,
@@ -11,7 +11,7 @@ import {
 import { IconTrash } from "@tabler/icons-react";
 import { MsgListItem } from "~/server/modules/msg/msg.model";
 import { formattedDateTime } from "~/utils/dateTime";
-import { trpc } from "~/utils/trpc";
+import { useHandleMessageDelete } from "../../../hooks/msg/useHandleMessageDelete";
 
 const useStyles = createStyles((theme) => ({
   root: {
@@ -61,22 +61,12 @@ interface Props {
 
 function MsgListItem({ msg }: Props) {
   const { classes } = useStyles();
-  const ctx = trpc.useContext();
-  const [loading, setLoading] = useState(false);
 
-  const deleteMutation = trpc.msg.delete.useMutation({
-    onSuccess: () => {
-      ctx.msg.list.invalidate();
-    },
-    onError: () => {
-      setLoading(false);
-    },
-  });
+  const { handler, isLoading } = useHandleMessageDelete();
 
   const handleDelete = useCallback(() => {
-    setLoading(true);
-    deleteMutation.mutate(msg._id);
-  }, [msg._id]);
+    handler(msg._id);
+  }, [handler, msg._id]);
 
   return (
     <Box className={classes.root}>
@@ -93,7 +83,7 @@ function MsgListItem({ msg }: Props) {
         {formattedDateTime(msg.createdAt)}
       </Text>
 
-      {loading ? (
+      {isLoading ? (
         <Loader size="sm" className={classes.loader} />
       ) : (
         <ActionIcon className={classes.delete}>
