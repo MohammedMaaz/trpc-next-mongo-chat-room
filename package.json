@@ -2,6 +2,9 @@
   "name": "@examples/next-minimal",
   "version": "10.15.0",
   "private": true,
+  "engines": {
+    "node": "16"
+  },
   "scripts": {
     "postinstall": "cd node_modules/ts-mongo && pnpm install && pnpm run build",
     "dev": "next dev",

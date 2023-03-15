@@ -32,6 +32,7 @@ const useStyles = createStyles((theme) => {
       flexDirection: "row",
       gap: "1rem",
       position: "relative",
+      alignItems: "flex-end",
     },
     textIp: {
       flex: 1,
@@ -155,7 +156,7 @@ function MsgForm({ onSubmit, loading }: Props) {
         )}
       </FileButton>
 
-      <Button type="submit" loading={loading} size="md" h="auto">
+      <Button type="submit" loading={loading} size="md" h="44">
         SEND
       </Button>
     </form>
