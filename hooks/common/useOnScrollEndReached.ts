@@ -1,5 +1,4 @@
 import { useCallback, useEffect, useRef } from "react";
-import debounce from "lodash.debounce";
 
 export function useOnScrollEndReached(
   onEndReached: (percent: number) => void,
@@ -10,16 +9,13 @@ export function useOnScrollEndReached(
   }
 ) {
   const ref = useRef<HTMLElement | null>(null);
+  const lastTime = useRef(0);
+  const scheduled = useRef(false);
   const {
     thresholdPercent = 80,
     debounceMs = 1000,
     direction = "down",
   } = options || {};
-
-  const _onEndReached = useCallback(
-    debounce(onEndReached, debounceMs, { leading: true, trailing: false }),
-    [onEndReached]
-  );
 
   useEffect(() => {
     const el = ref.current;
@@ -41,14 +37,30 @@ export function useOnScrollEndReached(
         const currentScroll = Math.abs(scrollTop);
         const maxScroll = scrollHeight - clientHeight;
         const currentPercent = (currentScroll / maxScroll) * 100;
-        if (currentPercent > thresholdPercent) _onEndReached(currentPercent);
+
+        // trigger only if scrolled more than threshold
+        if (currentPercent > thresholdPercent) {
+          // trigger only if debounce time has passed
+          if (Date.now() - lastTime.current > debounceMs) {
+            onEndReached(currentPercent);
+          }
+          // schedule next call if debounce time has not passed
+          else if (!scheduled.current) {
+            scheduled.current = true;
+            setTimeout(() => {
+              scheduled.current = false;
+              onEndReached(currentPercent);
+            }, debounceMs);
+          }
+          lastTime.current = Date.now();
+        }
       }
       lastScrollTop = scrollTop;
     };
 
     el.addEventListener("scroll", onScroll);
     return () => el.removeEventListener("scroll", onScroll);
-  }, [ref.current, thresholdPercent, direction, _onEndReached]);
+  }, [ref.current, thresholdPercent, direction, onEndReached]);
 
   return { ref };
 }

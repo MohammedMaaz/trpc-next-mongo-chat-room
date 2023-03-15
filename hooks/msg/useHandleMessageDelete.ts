@@ -14,9 +14,9 @@ export const useHandleMessageDelete = () => {
     },
   });
 
-  const handler = useCallback((id: string) => {
+  const handler = useCallback((id: string, onSuccess?: () => void) => {
     setIsLoading(true);
-    deleteMutation.mutate(id);
+    deleteMutation.mutate(id, { onSuccess });
   }, []);
 
   return { handler, isLoading };

@@ -13,7 +13,7 @@ import {
   createStyles,
   FileButton,
   Image,
-  TextInput,
+  Textarea,
 } from "@mantine/core";
 import { IconPaperclip } from "@tabler/icons-react";
 
@@ -24,14 +24,35 @@ const useStyles = createStyles((theme) => ({
     display: "flex",
     flexDirection: "row",
     gap: "1rem",
+    position: "relative",
   },
   textIp: {
     flex: 1,
+    "& textarea": {
+      borderColor: theme.colors.navyBlue[6],
+      "&:focus": {
+        outline: `1px solid ${theme.colors.navyBlue[6]}`,
+      },
+    },
+  },
+  imgBox: {
+    display: "flex",
+    position: "absolute",
+    bottom: "100%",
+    paddingBottom: "0.75rem",
+  },
+  img: {
+    "& img": {
+      objectFit: "contain",
+      minWidth: "100px",
+      maxWidth: "min(600px, 70vw)",
+      maxHeight: "min(600px, 70vh)",
+    },
   },
 }));
 
 interface Props {
-  onSubmit: (values: FormValues) => void;
+  onSubmit: (values: FormValues, onSuccess?: () => void) => void;
   loading?: boolean;
 }
 
@@ -46,8 +67,7 @@ function MsgForm({ onSubmit, loading }: Props) {
 
   const handleSubmit = useCallback(
     (values: FormValues) => {
-      onSubmit(values);
-      form.reset();
+      onSubmit(values, form.reset);
     },
     [onSubmit]
   );
@@ -61,42 +81,71 @@ function MsgForm({ onSubmit, loading }: Props) {
     resetRef.current?.();
   }, []);
 
+  const onPaste: React.ClipboardEventHandler<HTMLTextAreaElement> = useCallback(
+    (e) => {
+      if (e.clipboardData.files.length) {
+        form.setFieldValue("image", e.clipboardData.files[0]);
+        resetRef.current?.();
+      }
+    },
+    []
+  );
+
+  const onKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> = (e) => {
+    if (e.key === "Enter" && !e.shiftKey) {
+      e.preventDefault();
+      handleSubmit(form.values);
+    }
+  };
+
   return (
     <form className={classes.root} onSubmit={form.onSubmit(handleSubmit)}>
       {form.values.image ? (
-        <Box p={12} pb={0} pos="relative">
+        <Box className={classes.imgBox}>
           <Image
             alt="image to upload"
-            w={160}
-            h={140}
             src={URL.createObjectURL(form.values.image)}
-            fit="contain"
+            className={classes.img}
           />
           <CloseButton
             title="remove image"
             onClick={onFileRemove}
-            pos="absolute"
-            right={-12}
-            top={-12}
+            pos="relative"
+            left={-16}
+            top={-8}
+            variant="filled"
+            color="red"
+            disabled={loading}
           />
         </Box>
       ) : null}
 
-      <TextInput
+      <Textarea
+        onPaste={onPaste}
+        onKeyDown={onKeyDown}
         placeholder="Enter Message ..."
         className={classes.textIp}
+        autosize
+        minRows={1}
+        maxRows={4}
+        disabled={loading}
         {...form.getInputProps("text")}
       />
 
-      <FileButton resetRef={resetRef} onChange={onFileChange} accept="image/*">
+      <FileButton
+        disabled={loading}
+        resetRef={resetRef}
+        onChange={onFileChange}
+        accept="image/*"
+      >
         {(props) => (
-          <ActionIcon variant="outline" {...props}>
+          <ActionIcon variant="outline" color="navyBlue" {...props} size="xl">
             <IconPaperclip />
           </ActionIcon>
         )}
       </FileButton>
 
-      <Button type="submit" loading={loading}>
+      <Button type="submit" loading={loading} size="md" h="auto">
         SEND
       </Button>
     </form>

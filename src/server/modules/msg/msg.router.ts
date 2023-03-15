@@ -13,7 +13,7 @@ export const msgRouter = router({
       })
     )
     .query(async ({ input, ctx: { db } }) => {
-      const limit = input?.limit ?? 10;
+      const limit = input?.limit ?? 20;
       const page = input?.cursor ?? 1;
       const skipCount = (page - 1) * limit;
 

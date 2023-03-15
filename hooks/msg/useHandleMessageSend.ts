@@ -21,14 +21,15 @@ export function useHandleMessageSend() {
   });
 
   // send request to add message
-  const handler = useCallback((values: FormValues) => {
+  const handler = useCallback((values: FormValues, onSuccess?: () => void) => {
     addMutation.mutate(
       { text: values.text, hasImage: !!values.image },
       {
         onSuccess: (url) => {
           // send request to upload image if url is returned
           if (url && values.image)
-            uploadMutation.mutate({ file: values.image, url });
+            uploadMutation.mutate({ file: values.image, url }, { onSuccess });
+          else onSuccess?.();
         },
       }
     );

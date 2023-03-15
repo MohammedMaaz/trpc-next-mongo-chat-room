@@ -1,12 +1,11 @@
 import { useMemo } from "react";
 import { trpc } from "~/utils/trpc";
 
-export function useInfiniteMessagesList(limit: number = 10) {
-  const { data, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    trpc.msg.list.useInfiniteQuery(
-      { limit },
-      { getNextPageParam: (lastPage) => lastPage.nextCursor }
-    );
+export function useInfiniteMessagesList(limit: number = 20) {
+  const { data, ...rest } = trpc.msg.list.useInfiniteQuery(
+    { limit },
+    { getNextPageParam: (lastPage) => lastPage.nextCursor }
+  );
 
   const list = useMemo(
     () => data?.pages.map((item) => item.list).flat(),
@@ -14,10 +13,7 @@ export function useInfiniteMessagesList(limit: number = 10) {
   );
 
   return {
+    ...rest,
     list,
-    fetchNextPage,
-    hasNextPage,
-    isFetchingNextPage,
-    isLoading,
   };
 }

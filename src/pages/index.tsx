@@ -1,4 +1,3 @@
-import { useCallback } from "react";
 import { Box, createStyles } from "@mantine/core";
 import MsgForm from "~/components/msg/msgForm";
 import MsgList from "~/components/msg/msgList";
@@ -23,9 +22,11 @@ export default function IndexPage() {
   const { handler, isLoading: isSentLoading } = useHandleMessageSend();
 
   // Infinite scroll handling
-  const onEndReached = useCallback(() => {
-    if (hasNextPage && !isFetchingNextPage) fetchNextPage();
-  }, [hasNextPage, isFetchingNextPage, fetchNextPage]);
+  const onEndReached = () => {
+    if (hasNextPage && !isFetchingNextPage) {
+      fetchNextPage();
+    }
+  };
 
   const { ref } = useOnScrollEndReached(onEndReached, { direction: "up" });
 
