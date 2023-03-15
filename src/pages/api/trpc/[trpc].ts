@@ -1,7 +1,7 @@
 import * as trpcNext from "@trpc/server/adapters/next";
+import { publicProcedure, router } from "~/server/trpc";
 import { createContext } from "~/server/context";
 import { msgRouter } from "~/server/modules/msg/msg.router";
-import { publicProcedure, router } from "~/server/trpc";
 
 const appRouter = router({
   healthcheck: publicProcedure.query(() => "yay!"),

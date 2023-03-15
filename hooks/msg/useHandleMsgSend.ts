@@ -4,7 +4,7 @@ import { FormValues } from "~/components/msg/msgForm.helpers";
 import { uploadFileToUrl } from "~/utils/file";
 import { trpc } from "~/utils/trpc";
 
-export function useHandleMessageSend() {
+export function useHandleMsgSend() {
   const ctx = trpc.useContext();
 
   const uploadMutation = useMutation({

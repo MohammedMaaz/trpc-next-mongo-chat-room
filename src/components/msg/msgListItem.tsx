@@ -12,7 +12,7 @@ import {
 import { IconTrash } from "@tabler/icons-react";
 import { MsgListItem } from "~/server/modules/msg/msg.model";
 import { formattedDateTime } from "~/utils/dateTime";
-import { useHandleMessageDelete } from "../../../hooks/msg/useHandleMessageDelete";
+import { useHandleMsgDelete } from "../../../hooks/msg/useHandleMsgDelete";
 import { useDisclosure } from "@mantine/hooks";
 
 interface StyleProps {
@@ -88,7 +88,7 @@ function MsgListItem({ msg }: Props) {
   const { classes } = useStyles({ hasImage: !!msg.hasImage });
   const [opened, { open, close }] = useDisclosure(false);
 
-  const { handler, isLoading } = useHandleMessageDelete();
+  const { handler, isLoading } = useHandleMsgDelete();
 
   const handleDelete = useCallback(() => {
     handler(msg._id);

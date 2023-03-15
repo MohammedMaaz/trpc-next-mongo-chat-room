@@ -1,37 +1,36 @@
 import { render, screen } from "@testing-library/react";
 import Home from "~/pages/index";
 import "@testing-library/jest-dom";
-import { useInfiniteMessagesList } from "../hooks/msg/useInfiniteMessagesList";
+import { useInfiniteMsgList } from "../hooks/msg/useInfiniteMsgList";
 
-type MakePartial<T extends (...args: any) => any> = (
+type PartialReturnType<T extends (...args: any) => any> = (
   ...args: Parameters<T>
 ) => Partial<ReturnType<T>>;
 
-// mock hooks
+// mock all hooks to avoid calling trpc client APIs in tests
+let onEndReached: Function;
 jest.mock("../hooks/common/useOnScrollEndReached.ts", () => ({
   useOnScrollEndReached: (_onEndReached: Function) => {
+    //capture onEndReached to call later
     onEndReached = _onEndReached;
     return { ref: () => {} };
   },
 }));
-jest.mock("../hooks/msg/useHandleMessageSend.ts", () => ({
-  useHandleMessageSend: () => ({}),
+jest.mock("../hooks/msg/useHandleMsgSend.ts", () => ({
+  useHandleMsgSend: () => ({}),
 }));
-jest.mock("../hooks/msg/useHandleMessageDelete.ts", () => ({
-  useHandleMessageDelete: () => ({}),
+jest.mock("../hooks/msg/useHandleMsgDelete.ts", () => ({
+  useHandleMsgDelete: () => ({}),
 }));
-jest.mock("../hooks/msg/useInfiniteMessagesList.ts");
-
-const mockedUseInfiniteMessagesList =
-  useInfiniteMessagesList as jest.MockedFunction<
-    MakePartial<typeof useInfiniteMessagesList>
-  >;
-let onEndReached: Function;
+jest.mock("../hooks/msg/useInfiniteMsgList.ts");
+const mockedUseInfiniteMsgList = useInfiniteMsgList as jest.MockedFunction<
+  PartialReturnType<typeof useInfiniteMsgList>
+>;
 
 // tests
 describe("Infinite Scroll", () => {
   beforeEach(() => {
-    mockedUseInfiniteMessagesList.mockReturnValue({});
+    mockedUseInfiniteMsgList.mockReturnValue({});
   });
   afterEach(() => {
     jest.clearAllMocks();
@@ -43,7 +42,7 @@ describe("Infinite Scroll", () => {
 
   it("should not fetch more if end not reached, even when next page is available", () => {
     const mockedFetchNextPage = jest.fn();
-    mockedUseInfiniteMessagesList.mockReturnValue({
+    mockedUseInfiniteMsgList.mockReturnValue({
       list: [],
       fetchNextPage: mockedFetchNextPage,
       hasNextPage: true,
@@ -56,7 +55,7 @@ describe("Infinite Scroll", () => {
 
   it("should fetch more on end reached if next page is available", () => {
     const mockedFetchNextPage = jest.fn();
-    mockedUseInfiniteMessagesList.mockReturnValue({
+    mockedUseInfiniteMsgList.mockReturnValue({
       list: [],
       fetchNextPage: mockedFetchNextPage,
       hasNextPage: true,
@@ -70,7 +69,7 @@ describe("Infinite Scroll", () => {
 
   it("should not fetch more on end reached if next page is not available", () => {
     const mockedFetchNextPage = jest.fn();
-    mockedUseInfiniteMessagesList.mockReturnValue({
+    mockedUseInfiniteMsgList.mockReturnValue({
       list: [],
       fetchNextPage: mockedFetchNextPage,
       hasNextPage: false,
@@ -84,7 +83,7 @@ describe("Infinite Scroll", () => {
 
   it("should not fetch more on end reached if already fetching, even when next page is available", () => {
     const mockedFetchNextPage = jest.fn();
-    mockedUseInfiniteMessagesList.mockReturnValue({
+    mockedUseInfiniteMsgList.mockReturnValue({
       list: [],
       fetchNextPage: mockedFetchNextPage,
       hasNextPage: true,
@@ -99,7 +98,7 @@ describe("Infinite Scroll", () => {
 
   it("should display the fetched messages correctly", () => {
     const count = 15;
-    mockedUseInfiniteMessagesList.mockReturnValue({
+    mockedUseInfiniteMsgList.mockReturnValue({
       list: Array(count)
         .fill(true)
         .map((_, i) => ({

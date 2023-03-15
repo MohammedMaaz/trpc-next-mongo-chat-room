@@ -11,9 +11,7 @@ export const msgSchema = z.object({
 });
 
 export declare type Msg = z.infer<typeof msgSchema>;
+export declare type MsgRouter = inferRouterOutputs<AppRouter>["msg"];
+export declare type MsgListItem = MsgRouter["list"]["list"][number];
 
 export const msgCollection = (db: Db) => mkTsCollection<Msg>(db, "messages");
-
-export declare type MsgRouter = inferRouterOutputs<AppRouter>["msg"];
-
-export declare type MsgListItem = MsgRouter["list"]["list"][number];

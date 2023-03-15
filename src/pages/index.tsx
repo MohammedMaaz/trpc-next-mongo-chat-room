@@ -2,8 +2,8 @@ import { Box, createStyles } from "@mantine/core";
 import MsgForm from "~/components/msg/msgForm";
 import MsgList from "~/components/msg/msgList";
 import { useOnScrollEndReached } from "../../hooks/common/useOnScrollEndReached";
-import { useInfiniteMessagesList } from "../../hooks/msg/useInfiniteMessagesList";
-import { useHandleMessageSend } from "../../hooks/msg/useHandleMessageSend";
+import { useInfiniteMsgList } from "../../hooks/msg/useInfiniteMsgList";
+import { useHandleMsgSend } from "../../hooks/msg/useHandleMsgSend";
 
 const useStyles = createStyles(() => ({
   root: {
@@ -17,9 +17,9 @@ export default function IndexPage() {
   const { classes } = useStyles();
 
   const { list, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
-    useInfiniteMessagesList();
+    useInfiniteMsgList();
 
-  const { handler, isLoading: isSentLoading } = useHandleMessageSend();
+  const { handler, isLoading: isSentLoading } = useHandleMsgSend();
 
   // Infinite scroll handling
   const onEndReached = () => {

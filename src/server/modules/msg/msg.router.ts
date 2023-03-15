@@ -38,7 +38,7 @@ export const msgRouter = router({
     .input(
       z.object({
         ...msgSchema.shape,
-        createdAt: z.undefined(),
+        createdAt: z.undefined(), // createdAt not needed in input
       })
     )
     .mutation(async ({ input, ctx: { db } }) => {
@@ -65,6 +65,7 @@ export const msgRouter = router({
 
       if (value?.hasImage) {
         await deleteImg(value._id.toString()).catch((err) => {
+          // don't propagate image deletion errors to client
           console.error("Error deleting image: ", err);
         });
       }

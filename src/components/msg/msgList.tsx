@@ -10,6 +10,7 @@ const useStyles = createStyles(() => ({
     flexDirection: "column-reverse",
     height: "100%",
     padding: "0 0.75rem",
+    paddingTop: "1rem",
     backgroundColor: "#D9D8D8",
   },
   loader: {

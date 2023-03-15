@@ -1,7 +1,7 @@
 import { useMemo } from "react";
 import { trpc } from "~/utils/trpc";
 
-export function useInfiniteMessagesList(limit: number = 20) {
+export function useInfiniteMsgList(limit: number = 20) {
   const { data, ...rest } = trpc.msg.list.useInfiniteQuery(
     { limit },
     { getNextPageParam: (lastPage) => lastPage.nextCursor }

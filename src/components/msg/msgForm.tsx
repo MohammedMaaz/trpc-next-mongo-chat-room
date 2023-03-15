@@ -17,39 +17,47 @@ import {
 } from "@mantine/core";
 import { IconPaperclip } from "@tabler/icons-react";
 
-const useStyles = createStyles((theme) => ({
-  root: {
-    backgroundColor: theme.white,
-    padding: "0.75rem",
-    display: "flex",
-    flexDirection: "row",
-    gap: "1rem",
-    position: "relative",
-  },
-  textIp: {
-    flex: 1,
-    "& textarea": {
-      borderColor: theme.colors.navyBlue[6],
-      "&:focus": {
-        outline: `1px solid ${theme.colors.navyBlue[6]}`,
+const useStyles = createStyles((theme) => {
+  // issue with manitine theme overrides being resolved as undefined by jest dom
+  const primaryColor =
+    process.env.NODE_ENV === "test"
+      ? theme.colors.blue[6]
+      : theme.colors.navyBlue[6];
+
+  return {
+    root: {
+      backgroundColor: theme.white,
+      padding: "0.75rem",
+      display: "flex",
+      flexDirection: "row",
+      gap: "1rem",
+      position: "relative",
+    },
+    textIp: {
+      flex: 1,
+      "& textarea": {
+        borderColor: primaryColor,
+        "&:focus": {
+          outline: `1px solid ${primaryColor}`,
+        },
       },
     },
-  },
-  imgBox: {
-    display: "flex",
-    position: "absolute",
-    bottom: "100%",
-    paddingBottom: "0.75rem",
-  },
-  img: {
-    "& img": {
-      objectFit: "contain",
-      minWidth: "100px",
-      maxWidth: "min(600px, 70vw)",
-      maxHeight: "min(600px, 70vh)",
+    imgBox: {
+      display: "flex",
+      position: "absolute",
+      bottom: "100%",
+      paddingBottom: "0.75rem",
     },
-  },
-}));
+    img: {
+      "& img": {
+        objectFit: "contain",
+        minWidth: "100px",
+        maxWidth: "min(600px, 70vw)",
+        maxHeight: "min(600px, 70vh)",
+      },
+    },
+  };
+});
 
 interface Props {
   onSubmit: (values: FormValues, onSuccess?: () => void) => void;
@@ -72,26 +80,28 @@ function MsgForm({ onSubmit, loading }: Props) {
     [onSubmit]
   );
 
-  const onFileChange = useCallback((file: File | null) => {
+  const handleFileChange = useCallback((file: File | null) => {
     if (file) form.setFieldValue("image", file);
   }, []);
 
-  const onFileRemove = useCallback(() => {
+  const handleFileRemove = useCallback(() => {
     form.setFieldValue("image", undefined);
     resetRef.current?.();
   }, []);
 
-  const onPaste: React.ClipboardEventHandler<HTMLTextAreaElement> = useCallback(
-    (e) => {
+  // Allow pasting images
+  const handlePaste: React.ClipboardEventHandler<HTMLTextAreaElement> =
+    useCallback((e) => {
       if (e.clipboardData.files.length) {
         form.setFieldValue("image", e.clipboardData.files[0]);
         resetRef.current?.();
       }
-    },
-    []
-  );
+    }, []);
 
-  const onKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> = (e) => {
+  const handleKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> = (
+    e
+  ) => {
+    // Shift + Enter = new line | Enter = submit
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
       handleSubmit(form.values);
@@ -109,7 +119,7 @@ function MsgForm({ onSubmit, loading }: Props) {
           />
           <CloseButton
             title="remove image"
-            onClick={onFileRemove}
+            onClick={handleFileRemove}
             pos="relative"
             left={-16}
             top={-8}
@@ -121,8 +131,8 @@ function MsgForm({ onSubmit, loading }: Props) {
       ) : null}
 
       <Textarea
-        onPaste={onPaste}
-        onKeyDown={onKeyDown}
+        onPaste={handlePaste}
+        onKeyDown={handleKeyDown}
         placeholder="Enter Message ..."
         className={classes.textIp}
         autosize
@@ -135,7 +145,7 @@ function MsgForm({ onSubmit, loading }: Props) {
       <FileButton
         disabled={loading}
         resetRef={resetRef}
-        onChange={onFileChange}
+        onChange={handleFileChange}
         accept="image/*"
       >
         {(props) => (

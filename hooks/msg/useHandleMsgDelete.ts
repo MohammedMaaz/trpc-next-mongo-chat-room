@@ -1,7 +1,7 @@
 import { useCallback, useState } from "react";
 import { trpc } from "~/utils/trpc";
 
-export const useHandleMessageDelete = () => {
+export const useHandleMsgDelete = () => {
   const ctx = trpc.useContext();
   const [isLoading, setIsLoading] = useState(false);
 
