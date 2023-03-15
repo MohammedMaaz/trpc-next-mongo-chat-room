@@ -4,7 +4,7 @@
 
 https://trpc-next-mongo-chat-room.vercel.app/
 
-![Tests Status](https://github.com/github/docs/actions/workflows/main.yml/badge.svg)
+![Tests Status](https://github.com/github/docs/actions/workflows/test.yml/badge.svg)
 
 ### Running Locally
 
