@@ -12,7 +12,7 @@
     "test:watch": "jest --watch",
     "prebuild": "pnpm run test",
     "build": "next build",
-    "lint": "eslint --ext \".js,.ts,.tsx\" --report-unused-disable-directives src",
+    "lint": "eslint --ext \".js,.ts,.tsx\" --report-unused-disable-directives src --max-warnings=0",
     "start": "next start"
   },
   "dependencies": {

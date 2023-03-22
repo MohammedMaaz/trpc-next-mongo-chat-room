@@ -32,7 +32,7 @@ const useStyles = createStyles((theme) => {
       flexDirection: "row",
       gap: "1rem",
       position: "relative",
-      alignItems: "flex-end",
+      alignItems: "flex-start",
     },
     textIp: {
       flex: 1,
@@ -76,28 +76,37 @@ function MsgForm({ onSubmit, loading }: Props) {
 
   const handleSubmit = useCallback(
     (values: FormValues) => {
-      onSubmit(values, form.reset);
+      onSubmit(values, () => {
+        form.reset();
+        resetRef.current?.();
+      });
     },
-    [onSubmit]
+    [onSubmit, form]
   );
 
-  const handleFileChange = useCallback((file: File | null) => {
-    if (file) form.setFieldValue("image", file);
-  }, []);
+  const handleFileChange = useCallback(
+    (file: File | null) => {
+      if (file) form.setFieldValue("image", file);
+    },
+    [form]
+  );
 
   const handleFileRemove = useCallback(() => {
     form.setFieldValue("image", undefined);
     resetRef.current?.();
-  }, []);
+  }, [form]);
 
   // Allow pasting images
   const handlePaste: React.ClipboardEventHandler<HTMLTextAreaElement> =
-    useCallback((e) => {
-      if (e.clipboardData.files.length) {
-        form.setFieldValue("image", e.clipboardData.files[0]);
-        resetRef.current?.();
-      }
-    }, []);
+    useCallback(
+      (e) => {
+        if (e.clipboardData.files.length) {
+          form.setFieldValue("image", e.clipboardData.files[0]);
+          resetRef.current?.();
+        }
+      },
+      [form]
+    );
 
   const handleKeyDown: React.KeyboardEventHandler<HTMLTextAreaElement> = (
     e
@@ -150,7 +159,13 @@ function MsgForm({ onSubmit, loading }: Props) {
         accept="image/*"
       >
         {(props) => (
-          <ActionIcon variant="outline" color="navyBlue" {...props} size="xl">
+          <ActionIcon
+            disabled={loading}
+            variant="outline"
+            color="navyBlue"
+            {...props}
+            size="xl"
+          >
             <IconPaperclip />
           </ActionIcon>
         )}

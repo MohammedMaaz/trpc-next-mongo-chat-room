@@ -9,8 +9,9 @@ on:
       - "main"
 
 jobs:
-  test:
+  lint_and_test:
     runs-on: ubuntu-latest
+    name: ESLint and Jest tests
 
     strategy:
       matrix:
@@ -42,4 +43,5 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-pnpm-store-
       - run: pnpm install
+      - run: pnpm run lint
       - run: pnpm run test

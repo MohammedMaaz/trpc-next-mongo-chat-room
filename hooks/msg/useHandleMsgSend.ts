@@ -15,25 +15,31 @@ export function useHandleMsgSend() {
   });
 
   const addMutation = trpc.msg.add.useMutation({
-    onSuccess: (url) => {
-      if (!url) ctx.msg.list.invalidate();
+    onSuccess: ({ preSignedUrl }) => {
+      if (!preSignedUrl) ctx.msg.list.invalidate();
     },
   });
 
   // send request to add message
-  const handler = useCallback((values: FormValues, onSuccess?: () => void) => {
-    addMutation.mutate(
-      { text: values.text, hasImage: !!values.image },
-      {
-        onSuccess: (url) => {
-          // send request to upload image if url is returned
-          if (url && values.image)
-            uploadMutation.mutate({ file: values.image, url }, { onSuccess });
-          else onSuccess?.();
-        },
-      }
-    );
-  }, []);
+  const handler = useCallback(
+    (values: FormValues, onSuccess?: (id: string) => void) => {
+      addMutation.mutate(
+        { text: values.text, hasImage: !!values.image },
+        {
+          onSuccess: ({ preSignedUrl, msgId }) => {
+            // send request to upload image if url is returned
+            if (preSignedUrl && values.image)
+              uploadMutation.mutate(
+                { file: values.image, url: preSignedUrl },
+                { onSuccess: () => onSuccess?.(msgId) }
+              );
+            else onSuccess?.(msgId);
+          },
+        }
+      );
+    },
+    [addMutation.mutate, uploadMutation.mutate]
+  );
 
   return {
     handler,

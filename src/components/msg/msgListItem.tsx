@@ -1,4 +1,4 @@
-import React, { useCallback } from "react";
+import React, { useCallback, useEffect, useRef, useState } from "react";
 import {
   ActionIcon,
   Box,
@@ -44,6 +44,13 @@ const useStyles = createStyles((theme, { hasImage }: StyleProps) => ({
       objectFit: "cover",
     },
   },
+  imgLoader: {
+    width: 200,
+    height: 200,
+    display: "grid",
+    placeItems: "center",
+    backgroundColor: theme.white,
+  },
   textBox: {
     backgroundColor: theme.white,
     padding: "0.625rem 0.75rem",
@@ -87,12 +94,22 @@ interface Props {
 function MsgListItem({ msg }: Props) {
   const { classes } = useStyles({ hasImage: !!msg.hasImage });
   const [opened, { open, close }] = useDisclosure(false);
+  const [imgLoaded, setImgLoaded] = useState(false);
+  const imgRef = useRef<HTMLImageElement>(null);
 
   const { handler, isLoading } = useHandleMsgDelete();
 
   const handleDelete = useCallback(() => {
     handler(msg._id);
   }, [handler, msg._id]);
+
+  const onImgLoad = useCallback(() => {
+    setImgLoaded(true);
+  }, []);
+
+  useEffect(() => {
+    if (imgRef.current?.complete) onImgLoad();
+  }, [onImgLoad]);
 
   return (
     <Box className={classes.root}>
@@ -102,13 +119,24 @@ function MsgListItem({ msg }: Props) {
         </Box>
 
         {msg.hasImage ? (
-          <Image
-            src={msg.imgUrl}
-            className={classes.img}
-            alt={msg.text}
-            onClick={open}
-            withPlaceholder
-          />
+          <>
+            {!imgLoaded ? (
+              <Box className={classes.imgLoader}>
+                <Loader />
+              </Box>
+            ) : null}
+            <Image
+              src={msg.imgUrl}
+              className={classes.img}
+              alt={msg.text}
+              onClick={open}
+              withPlaceholder
+              imageRef={imgRef}
+              style={{ display: imgLoaded ? undefined : "none" }}
+              onLoad={onImgLoad}
+              imageProps={{ onError: onImgLoad }}
+            />
+          </>
         ) : null}
 
         {isLoading ? (

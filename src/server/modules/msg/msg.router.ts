@@ -48,11 +48,13 @@ export const msgRouter = router({
       let preSignedUrl: string | null = null;
 
       const res = await collection.insertOne(doc);
+      const msgId = res.insertedId.toString();
+
       if (input.hasImage) {
-        preSignedUrl = await getPreSignedUrl(res.insertedId.toString());
+        preSignedUrl = await getPreSignedUrl(msgId);
       }
 
-      return preSignedUrl;
+      return { preSignedUrl, msgId };
     }),
 
   delete: publicProcedure

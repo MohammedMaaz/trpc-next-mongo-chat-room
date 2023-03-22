@@ -1,10 +1,19 @@
 import { notifications } from "@mantine/notifications";
 
-export function globalErrorHandler(error: Error | any) {
+export function globalErrorHandler(error: Error | unknown) {
   let message = "An unknown error occurred!";
-  if (error instanceof Error || typeof error?.message === "string")
+
+  if (typeof error === "string") message = error;
+  if (error instanceof Error) message = error.message;
+
+  if (
+    error &&
+    typeof error === "object" &&
+    "message" in error &&
+    typeof error.message === "string"
+  ) {
     message = error.message;
-  else if (typeof error === "string") message = error;
+  }
 
   console.error("error: ", message, error);
   notifications.show({ title: "Error", message, color: "red" });

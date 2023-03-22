@@ -4,6 +4,7 @@ import MsgList from "~/components/msg/msgList";
 import { useOnScrollEndReached } from "../../hooks/common/useOnScrollEndReached";
 import { useInfiniteMsgList } from "../../hooks/msg/useInfiniteMsgList";
 import { useHandleMsgSend } from "../../hooks/msg/useHandleMsgSend";
+import { useEffect, useRef } from "react";
 
 const useStyles = createStyles(() => ({
   root: {
@@ -15,6 +16,7 @@ const useStyles = createStyles(() => ({
 
 export default function IndexPage() {
   const { classes } = useStyles();
+  const lastMsgIdRef = useRef("");
 
   const { list, fetchNextPage, hasNextPage, isFetchingNextPage, isLoading } =
     useInfiniteMsgList();
@@ -30,6 +32,24 @@ export default function IndexPage() {
 
   const { ref } = useOnScrollEndReached(onEndReached, { direction: "up" });
 
+  const onSubmit: typeof handler = (values, onSuccess) => {
+    handler(values, (id) => {
+      onSuccess?.(id);
+      // Save last sent message id to use it in useEffect
+      lastMsgIdRef.current = id;
+    });
+  };
+
+  // Scroll to bottom on new message
+  const latestId = list?.[0]?._id;
+  const listElem = ref.current;
+  useEffect(() => {
+    if (latestId === lastMsgIdRef.current && listElem) {
+      listElem.scrollTop = listElem.scrollHeight;
+      lastMsgIdRef.current = "";
+    }
+  }, [latestId, listElem]);
+
   return (
     <Box className={classes.root}>
       <MsgList
@@ -38,7 +58,7 @@ export default function IndexPage() {
         loading={isLoading}
         loadingMore={isFetchingNextPage}
       />
-      <MsgForm onSubmit={handler} loading={isSentLoading} />
+      <MsgForm onSubmit={onSubmit} loading={isSentLoading} />
     </Box>
   );
 }

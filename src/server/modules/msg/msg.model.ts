@@ -5,7 +5,7 @@ import { inferRouterOutputs } from "@trpc/server";
 import { AppRouter } from "~/pages/api/trpc/[trpc]";
 
 export const msgSchema = z.object({
-  text: z.string().min(1).max(10000),
+  text: z.string().min(1, "text is required"),
   hasImage: z.boolean().optional(),
   createdAt: z.date(),
 });

@@ -1,8 +1,7 @@
 import * as z from "zod";
-import { msgSchema } from "~/server/modules/msg/msg.model";
 
 export const validationSchema = z.object({
-  text: msgSchema.shape.text,
+  text: z.string().trim().min(1, "Please enter a message"),
   image: typeof File !== "undefined" ? z.instanceof(File).optional() : z.any(),
 });
 
