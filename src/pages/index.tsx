@@ -4,7 +4,7 @@ import MsgList from "~/components/msg/msgList";
 import { useOnScrollEndReached } from "../../hooks/common/useOnScrollEndReached";
 import { useInfiniteMsgList } from "../../hooks/msg/useInfiniteMsgList";
 import { useHandleMsgSend } from "../../hooks/msg/useHandleMsgSend";
-import { useEffect, useRef } from "react";
+import React, { useEffect, useRef } from "react";
 
 const useStyles = createStyles(() => ({
   root: {
@@ -14,7 +14,7 @@ const useStyles = createStyles(() => ({
   },
 }));
 
-export default function IndexPage() {
+const IndexPage: React.FC = () => {
   const { classes } = useStyles();
   const lastMsgIdRef = useRef("");
 
@@ -24,7 +24,7 @@ export default function IndexPage() {
   const { handler, isLoading: isSentLoading } = useHandleMsgSend();
 
   // Infinite scroll handling
-  const onEndReached = () => {
+  const onEndReached = (): void => {
     if (hasNextPage && !isFetchingNextPage) {
       fetchNextPage();
     }
@@ -61,4 +61,6 @@ export default function IndexPage() {
       <MsgForm onSubmit={onSubmit} loading={isSentLoading} />
     </Box>
   );
-}
+};
+
+export default IndexPage;

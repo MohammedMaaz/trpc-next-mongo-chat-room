@@ -1,8 +1,8 @@
-import { MongoClient } from "mongodb";
+import { Db, MongoClient } from "mongodb";
 
 let client: MongoClient | null = null;
 
-export const setupDb = () => {
+export const setupDb = (): Db => {
   if (!client) {
     client = new MongoClient(process.env.MONGO_URL ?? "");
   }

@@ -91,7 +91,7 @@ interface Props {
   msg: MsgListItem;
 }
 
-function MsgListItem({ msg }: Props) {
+const MsgListItem: React.FC<Props> = ({ msg }) => {
   const { classes } = useStyles({ hasImage: !!msg.hasImage });
   const [opened, { open, close }] = useDisclosure(false);
   const [imgLoaded, setImgLoaded] = useState(false);
@@ -159,6 +159,6 @@ function MsgListItem({ msg }: Props) {
       ) : null}
     </Box>
   );
-}
+};
 
 export default MsgListItem;

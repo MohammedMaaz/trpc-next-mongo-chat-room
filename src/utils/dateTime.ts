@@ -12,7 +12,7 @@ dayjs.extend(isBetween);
 dayjs.extend(weekOfYear);
 dayjs.extend(advanceFormat);
 
-export function formattedDateTime(date: string | Date | Dayjs) {
+export function formattedDateTime(date: string | Date | Dayjs): string {
   const given = dayjs(date);
   const now = dayjs();
 

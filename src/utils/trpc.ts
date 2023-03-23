@@ -4,7 +4,7 @@ import { createTRPCNext } from "@trpc/next";
 import type { AppRouter } from "../pages/api/trpc/[trpc]";
 import { globalErrorHandler } from "./errorHandler";
 
-function getBaseUrl() {
+function getBaseUrl(): string {
   if (typeof window !== "undefined") {
     return "";
   }

@@ -1,4 +1,4 @@
-import axios from "axios";
+import axios, { AxiosResponse } from "axios";
 
 export function uploadFileToUrl({
   file,
@@ -8,8 +8,8 @@ export function uploadFileToUrl({
   file: File;
   url: string;
   method?: "PUT" | "POST";
-}) {
-  return axios.request({
+}): Promise<AxiosResponse<void>> {
+  return axios.request<void>({
     url,
     method,
     data: file,

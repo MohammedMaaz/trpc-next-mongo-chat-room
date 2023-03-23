@@ -1,6 +1,6 @@
 import { notifications } from "@mantine/notifications";
 
-export function globalErrorHandler(error: Error | unknown) {
+export function globalErrorHandler(error: Error | unknown): void {
   let message = "An unknown error occurred!";
 
   if (typeof error === "string") message = error;

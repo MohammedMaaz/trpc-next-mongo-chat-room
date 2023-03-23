@@ -6,7 +6,7 @@ const getInitialProps = createGetInitialProps();
 export default class _Document extends Document {
   static getInitialProps = getInitialProps;
 
-  render() {
+  render(): JSX.Element {
     return (
       <Html>
         <Head />

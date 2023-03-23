@@ -35,7 +35,12 @@ interface Props {
   containerRef?: React.RefObject<HTMLDivElement>;
 }
 
-function MsgList({ list, loading, loadingMore, containerRef }: Props) {
+const MsgList: React.FC<Props> = ({
+  list,
+  loading,
+  loadingMore,
+  containerRef,
+}) => {
   const { classes } = useStyles();
 
   return (
@@ -55,6 +60,6 @@ function MsgList({ list, loading, loadingMore, containerRef }: Props) {
       ) : null}
     </div>
   );
-}
+};
 
 export default MsgList;

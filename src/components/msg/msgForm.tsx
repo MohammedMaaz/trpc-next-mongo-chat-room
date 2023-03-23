@@ -1,4 +1,4 @@
-import React, { useCallback, useMemo, useRef } from "react";
+import React, { ReactNode, useCallback, useMemo, useRef } from "react";
 import { useForm, zodResolver } from "@mantine/form";
 import {
   FormValues,
@@ -65,7 +65,7 @@ interface Props {
   loading?: boolean;
 }
 
-function MsgForm({ onSubmit, loading }: Props) {
+const MsgForm: React.FC<Props> = ({ onSubmit, loading }) => {
   const { classes } = useStyles();
   const resetRef = useRef<() => void>(null);
 
@@ -159,7 +159,7 @@ function MsgForm({ onSubmit, loading }: Props) {
         onChange={handleFileChange}
         accept="image/*"
       >
-        {(props) => (
+        {(props): ReactNode => (
           <ActionIcon
             disabled={loading}
             variant="outline"
@@ -177,6 +177,6 @@ function MsgForm({ onSubmit, loading }: Props) {
       </Button>
     </form>
   );
-}
+};
 
 export default MsgForm;
