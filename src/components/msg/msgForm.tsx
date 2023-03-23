@@ -1,4 +1,4 @@
-import React, { useCallback, useRef } from "react";
+import React, { useCallback, useMemo, useRef } from "react";
 import { useForm, zodResolver } from "@mantine/form";
 import {
   FormValues,
@@ -38,7 +38,7 @@ const useStyles = createStyles((theme) => {
       flex: 1,
       "& textarea": {
         borderColor: primaryColor,
-        "&:focus": {
+        "&:focus:not([data-invalid])": {
           outline: `1px solid ${primaryColor}`,
         },
       },
@@ -74,14 +74,15 @@ function MsgForm({ onSubmit, loading }: Props) {
     validate: zodResolver(validationSchema),
   });
 
-  const handleSubmit = useCallback(
-    (values: FormValues) => {
-      onSubmit(values, () => {
-        form.reset();
-        resetRef.current?.();
-      });
-    },
-    [onSubmit, form]
+  const handleSubmit = useMemo(
+    () =>
+      form.onSubmit((values: FormValues) => {
+        onSubmit(values, () => {
+          form.reset();
+          resetRef.current?.();
+        });
+      }),
+    [form, onSubmit]
   );
 
   const handleFileChange = useCallback(
@@ -114,12 +115,12 @@ function MsgForm({ onSubmit, loading }: Props) {
     // Shift + Enter = new line | Enter = submit
     if (e.key === "Enter" && !e.shiftKey) {
       e.preventDefault();
-      handleSubmit(form.values);
+      handleSubmit();
     }
   };
 
   return (
-    <form className={classes.root} onSubmit={form.onSubmit(handleSubmit)}>
+    <form className={classes.root} onSubmit={handleSubmit}>
       {form.values.image ? (
         <Box className={classes.imgBox}>
           <Image
